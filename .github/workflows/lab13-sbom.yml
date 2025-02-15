@@ -49,9 +49,9 @@ jobs:
       - name: Install .NET dependencies
         run: dotnet restore
       - name: Build application
-        run: dotnet build --output spdxExample
+        run: dotnet build
       - name: Generate SBOM
-        run: sbom-tool generate -PackageSupplier "Ci-Security Example ltd" -BuildComponentPath {{github.workspace}}/spdxExample -PackageName ExamplePackage -PackageVersion 1 -BuildDropPath ./sbom-reports
+        run: sbom-tool generate -PackageSupplier "Ci-Security Example ltd" -BuildComponentPath ./apps -PackageName ExamplePackage -PackageVersion 1 -BuildDropPath ./sbom-reports
       - name: Upload sbom results
         uses: actions/upload-artifact@master
         if: ${{ always() }}
