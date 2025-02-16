@@ -36,7 +36,7 @@ jobs:
       - name: Create annotation for depencency check error
         if: failure()
         run: |
-          echo "::warning title=Vulnerable dependencies found:: Found vulnerable dependencies, check dependency check report"
+          echo "::error title=Vulnerable dependencies found:: Found vulnerable dependencies, check dependency check report"
 
   dotnet-depencency-check:
     runs-on: ubuntu-latest
@@ -44,6 +44,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Run dotnet restore
-        run: dotnet restore
+        run: dotnet restore ${{ github.event.inputs.path }}
       - name: Run dotnet package check
-        run: dotnet ./${{ github.event.inputs.path }} list package --vulnerable
+        run: dotnet list ${{ github.event.inputs.path }} package --vulnerable
