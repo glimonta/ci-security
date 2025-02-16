@@ -3,9 +3,47 @@ run-name: Lab10 - ${{ github.actor }} is finding vulns🚀
 permissions: read-all
 on:
   workflow_dispatch:
+    inputs:
+      path:
+        type: choice
+        options:
+          - apps/uptodate-app
+          - apps/vulnerable-app
+
 jobs:
-  example-job:
+  owasp-dependency-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Run hello world
-        run: echo "🎉 Step of the job is running on ${{ runner.os }}!"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Depcheck
+        uses: dependency-check/Dependency-Check_Action@main
+        id: Depcheck
+        with:
+          project: ${{ github.event.inputs.path }}
+          path: ${{ github.event.inputs.path }}
+          format: "HTML"
+          out: "reports" # this is the default, no need to specify unless you wish to override it
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+      - name: Upload Test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@master
+        with:
+          name: Depcheck report
+          path: ${{github.workspace}}/reports
+      - name: Create annotation for depencency check error
+        if: failure()
+        run: |
+          echo "::warning title=Vulnerable dependencies found:: Found vulnerable dependencies, check dependency check report"
+
+  dotnet-depencency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run dotnet restore
+        run: dotnet restore
+      - name: Run dotnet package check
+        run: dotnet ${{ github.event.inputs.path }} list package --vulnerable
