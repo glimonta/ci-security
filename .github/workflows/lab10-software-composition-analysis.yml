@@ -46,4 +46,4 @@ jobs:
       - name: Run dotnet restore
         run: dotnet restore ${{ github.event.inputs.path }}
       - name: Run dotnet package check
-        run: dotnet list ${{ github.event.inputs.path }} package --vulnerable
+        run: dotnet list ${{ github.event.inputs.path }} package --vulnerable --include-transitive
